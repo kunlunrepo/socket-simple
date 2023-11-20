@@ -5,6 +5,13 @@
 #include<WinSock2.h>
 #include<stdio.h>
 
+// 定义传输数据包
+struct DataPackage
+{
+	int age;
+	char name[32];
+};
+
 int main()
 {
 	// 启动WindowsSocket2.x环境
@@ -59,11 +66,11 @@ int main()
 		}
 		printf("收到命令：%s \n", _recvBuf);
 		// 6 处理请求
-		if (0 == strcmp(_recvBuf, "getName"))
+		if (0 == strcmp(_recvBuf, "getInfo"))
 		{
 			// 7 send 向客户端发送一条数据
-			char msgBuf[] = "Xiao Qiang";
-			send(_cSock, msgBuf, strlen(msgBuf) + 1, 0);
+			DataPackage dp = {80, "张国荣"};
+			send(_cSock, (const char*)&dp, sizeof(DataPackage), 0);
 
 		}
 		else if (0 == strcmp(_recvBuf, "getAge"))

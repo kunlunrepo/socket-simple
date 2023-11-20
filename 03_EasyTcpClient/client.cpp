@@ -5,6 +5,13 @@
 #include<WinSock2.h>
 #include<stdio.h>
 
+// 定义传输数据包
+struct DataPackage
+{
+	int age; // 变量顺序需和服务端一致
+	char name[32];
+};
+
 int main()
 {
 	// 启动WindowsSocket2.x环境
@@ -58,7 +65,8 @@ int main()
 		int nlen = recv(_sock, recvBuf, 256, 0);
 		if (nlen > 0)
 		{
-			printf("接收到数据：%s\n", recvBuf);
+			DataPackage* dp = (DataPackage*)recvBuf;
+			printf("接收到数据：年龄=%d 名称=%s \n", dp->age, dp->name);
 		}
 	}
 
