@@ -9,7 +9,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "01_HelloSocket", "01_HelloS
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "02_EasyTcpServer", "02_EasyTcpServer\02_EasyTcpServer.vcxproj", "{5E8F90EA-9993-4778-8D34-939AB19DC81B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "03_EasyTcpClient", "03_EasyTcpClient\03_EasyTcpClient.vcxproj", "{A651A5D9-EB67-47D9-9A75-690ECC744BF1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "02_EasyTcpClient", "02_EasyTcpClient\02_EasyTcpClient.vcxproj", "{A651A5D9-EB67-47D9-9A75-690ECC744BF1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
