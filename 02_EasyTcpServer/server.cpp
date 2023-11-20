@@ -5,11 +5,38 @@
 #include<WinSock2.h>
 #include<stdio.h>
 
-// 定义传输数据包
-struct DataPackage
+enum CMD
 {
-	int age;
-	char name[32];
+	CMD_LOGIN,
+	CMD_LOGOUT,
+	CMD_ERROR
+};
+
+struct DataHeader
+{
+	short dataLength;
+	short cmd;
+};
+
+// 登录
+struct Login
+{
+	char userName[32];
+	char passWord[32];
+};
+struct LoginResult
+{
+	int result;
+};
+
+// 登出
+struct Logout
+{
+	char userName[32];
+};
+struct LogoutResult
+{
+	int result;
 };
 
 int main()
@@ -54,37 +81,69 @@ int main()
 	}
 	printf("新客户端加入：socket = %d IP = %s \n",(int)_cSock,  inet_ntoa(clientAddr.sin_addr));
 
-	char _recvBuf[128] = {};
+	//char _recvBuf[128] = {};
 	while (true) // 循环等待
 	{
+		DataHeader header = {};
+
 		// 5 接收客户端数据
-		int nLen = recv(_cSock, _recvBuf, 128, 0);
+		int nLen = recv(_cSock, (char*)&header, sizeof(DataHeader), 0);
 		if (nLen <= 0)
 		{
 			printf("客户端已退出，任务结束。\n");
 			break;
 		}
-		printf("收到命令：%s \n", _recvBuf);
-		// 6 处理请求
-		if (0 == strcmp(_recvBuf, "getInfo"))
+		printf("收到命令：%d 数据长度：%d\n", header.cmd, header.dataLength);
+		switch (header.cmd)
 		{
-			// 7 send 向客户端发送一条数据
-			DataPackage dp = {80, "张国荣"};
-			send(_cSock, (const char*)&dp, sizeof(DataPackage), 0);
+			case CMD_LOGIN:
+				{
+					Login login = {}; // 结构体重置
+					recv(_cSock, (char*)&login, sizeof(Login), 0);
+					LoginResult ret = {1};
+					send(_cSock, (char*)&header, sizeof(DataHeader), 0); // 先发消息头
+					send(_cSock, (char*)&ret, sizeof(LoginResult), 0); // 后发消息体
+				}
+				break;
+			case CMD_LOGOUT:
+				{
+					Logout logout = {}; // 结构体重置
+					recv(_cSock, (char*)&logout, sizeof(Logout), 0);
+					LogoutResult ret = { 1 };
+					send(_cSock, (char*)&header, sizeof(DataHeader), 0); // 先发消息头
+					send(_cSock, (char*)&ret, sizeof(LogoutResult), 0); // 后发消息体
+				}
+				break;
+			default:
+				{
+					header.cmd = CMD_ERROR;
+					header.dataLength = 0;
+					send(_cSock, (char*)&header, sizeof(DataHeader), 0); // 先发消息头
 
+				}
+				break;
 		}
-		else if (0 == strcmp(_recvBuf, "getAge"))
-		{
-			// 7 send 向客户端发送一条数据
-			char msgBuf[] = "80.";
-			send(_cSock, msgBuf, strlen(msgBuf) + 1, 0);
-		}
-		else
-		{
-			// 7 send 向客户端发送一条数据
-			char msgBuf[] = "???.";
-			send(_cSock, msgBuf, strlen(msgBuf) + 1, 0);
-		}
+		
+		// 6 处理请求
+		//if (0 == strcmp(_recvBuf, "getInfo"))
+		//{
+		//	// 7 send 向客户端发送一条数据
+		//	DataPackage dp = {80, "张国荣"};
+		//	send(_cSock, (const char*)&dp, sizeof(DataPackage), 0);
+
+		//}
+		//else if (0 == strcmp(_recvBuf, "getAge"))
+		//{
+		//	// 7 send 向客户端发送一条数据
+		//	char msgBuf[] = "80.";
+		//	send(_cSock, msgBuf, strlen(msgBuf) + 1, 0);
+		//}
+		//else
+		//{
+		//	// 7 send 向客户端发送一条数据
+		//	char msgBuf[] = "???.";
+		//	send(_cSock, msgBuf, strlen(msgBuf) + 1, 0);
+		//}
 	}
 	// 8 关闭套接字closeSocket
 	closesocket(_sock);
